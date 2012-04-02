@@ -21,6 +21,9 @@ def podiff(old_pofile, new_pofile):
             if getattr(old_msg, attr) != getattr(new_msg, attr):
                 identical = False
 
+        if set(old_msg.flags) != set(new_msg.flags):
+            identical = False
+
         if not identical:
             changed.append({'old':old_msg, 'new':new_msg})
 
@@ -75,6 +78,13 @@ def pprint_diff(diff):
             print "\tmsgstr old: %r\n\t       new: %r" % (old.msgstr, new.msgstr)
         if old.msgstr_plural != new.msgstr_plural:
             print "\tmsgstr_plural old: %r\n\tnew: %r" % (old.msgstr_plural, new.msgstr_plural)
+
+        added_flags = set(new.flags) - set(old.flags)
+        deleted_flags = set(old.flags) - set(new.flags)
+        if len(added_flags) > 0:
+            print "\tAdded flags: %s" % (",".join(sorted(added_flags)))
+        if len(deleted_flags) > 0:
+            print "\tDelete flags: %s" % (",".join(sorted(deleted_flags)))
 
 
     for key, value in diff['added_metadata_keys']:
