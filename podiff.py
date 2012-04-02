@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import polib, os, sys
+import polib, os, sys, argparse
 
 def podiff(old_pofile, new_pofile):
     # TODO support context
@@ -70,8 +70,15 @@ def exit_code(diff):
         return 1
 
 def main(argv):
-    old, new = argv
-    diffs = podiff(polib.pofile(old), polib.pofile(new))
+    parser = argparse.ArgumentParser()
+    #parser.add_argument('--no-ignore-comments')
+
+    parser.add_argument('old_file')
+    parser.add_argument('new_file')
+    args = parser.parse_args(argv)
+
+    diffs = podiff(polib.pofile(args.old_file), polib.pofile(args.new_file))
+
     pprint_diff(diffs)
     return exit_code(diffs)
 
