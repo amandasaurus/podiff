@@ -24,9 +24,26 @@ def podiff(old_pofile, new_pofile):
         if not identical:
             changed.append({'old':old_msg, 'new':new_msg})
 
+    # metadata
+    added_metadata_keys = set(new_pofile.metadata) - set(old_pofile.metadata)
+    deleted_metadata_keys = set(old_pofile.metadata) - set(new_pofile.metadata)
+    common_metadata_keys = set(old_pofile.metadata) & set(new_pofile.metadata)
+
+    changed_metadata = []
+    for common in common_metadata_keys:
+        old_metadata = old_pofile.metadata[common]
+        new_metadata = new_pofile.metadata[common]
+
+        if old_metadata != new_metadata:
+            changed_metadata.append({'key': common, 'old':old_metadata, 'new':new_metadata})
 
 
-    return {'added':[new_msgs[x] for x in added_msgs], 'deleted':[old_msgs[x] for x in deleted_msgs], 'changed':changed}
+    return {
+        'added':[new_msgs[x] for x in added_msgs], 'deleted':[old_msgs[x] for x in deleted_msgs], 'changed':changed,
+        'added_metadata_keys': [x for x in new_pofile.metadata.items() if x[0] in added_metadata_keys],
+        'deleted_metadata_keys': [x for x in old_pofile.metadata.items() if x[0] in deleted_metadata_keys],
+        'changed_metadata': changed_metadata,
+    }
 
     
 def _repr_msg(msg):
@@ -55,19 +72,31 @@ def pprint_diff(diff):
         change = ""
         print "Changed msg: %s" % _repr_msg(old)
         if old.msgstr != new.msgstr:
-            print "\tmsgstr old: %r new: %r" % (old.msgstr, new.msgstr)
+            print "\tmsgstr old: %r\n\t       new: %r" % (old.msgstr, new.msgstr)
         if old.msgstr_plural != new.msgstr_plural:
-            print "\tmsgstr_plural old: %r new: %r" % (old.msgstr_plural, new.msgstr_plural)
+            print "\tmsgstr_plural old: %r\n\tnew: %r" % (old.msgstr_plural, new.msgstr_plural)
 
-    if len(diff['added']) == 0 and len(diff['deleted']) == 0 and len(diff['changed']) == 0:
+
+    for key, value in diff['added_metadata_keys']:
+        print "New metadata: %r: %r" % (key, value)
+
+    for key, value in diff['deleted_metadata_keys']:
+        print "Deleted metadata: %r: %r" % (key, value)
+
+    for key in diff['changed_metadata']:
+        print "Changed metadata: %r" % key['key']
+        print "\told: %r" % key['old']
+        print "\tnew: %r" % key['new']
+
+
+    diff_keys = ['added', 'deleted', 'changed', 'added_metadata_keys', 'deleted_metadata_keys', 'changed_metadata']
+    if all(len(diff[key]) == 0 for key in diff_keys):
         print "pofiles are semantically identical"
 
 
 def exit_code(diff):
-    if len(diff['added']) == 0 and len(diff['deleted']) == 0 and len(diff['changed']) == 0:
-        return 0
-    else:
-        return 1
+    diff_keys = ['added', 'deleted', 'changed', 'added_metadata_keys', 'deleted_metadata_keys', 'changed_metadata']
+    return 0 if all(len(diff[key]) == 0 for key in diff_keys) else 1
 
 def main(argv):
     parser = argparse.ArgumentParser()
