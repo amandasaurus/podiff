@@ -10,4 +10,9 @@ setup(name="podiff",
       install_requires=['polib'],
       licence = 'GPLv3',
       description = 'Sematically compare two .po/gettext files for differences, ignoring, ordering, whitespace, comments, etc.',
+      entry_points = {
+          'console_scripts': [
+              'podiff = podiff:main',
+          ]
+      },
 )
