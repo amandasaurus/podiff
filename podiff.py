@@ -108,13 +108,13 @@ def exit_code(diff):
     diff_keys = ['added', 'deleted', 'changed', 'added_metadata_keys', 'deleted_metadata_keys', 'changed_metadata']
     return 0 if all(len(diff[key]) == 0 for key in diff_keys) else 1
 
-def main(argv):
+def main():
     parser = argparse.ArgumentParser()
     #parser.add_argument('--no-ignore-comments')
 
     parser.add_argument('old_file')
     parser.add_argument('new_file')
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     diffs = podiff(polib.pofile(args.old_file), polib.pofile(args.new_file))
 
@@ -123,5 +123,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())
         
