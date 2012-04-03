@@ -7,4 +7,7 @@ setup(name="podiff",
       author="Rory McCann",
       author_email="rory@technomancy.org",
       py_modules=['podiff'],
+      install_requires=['polib'],
+      licence = 'GPLv3',
+      description = 'Sematically compare two .po/gettext files for differences, ignoring, ordering, whitespace, comments, etc.',
 )
