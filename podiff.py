@@ -1,11 +1,11 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 
 import polib, os, sys, argparse
 
 def podiff(old_pofile, new_pofile):
     # TODO support context
-    old_msgs = dict(((entry.msgid, entry.msgid_plural), entry) for entry in old_pofile)
-    new_msgs = dict(((entry.msgid, entry.msgid_plural), entry) for entry in new_pofile)
+    old_msgs = dict(((entry.msgid, entry.msgctxt, entry.msgid_plural), entry) for entry in old_pofile)
+    new_msgs = dict(((entry.msgid, entry.msgctxt, entry.msgid_plural), entry) for entry in new_pofile)
 
     added_msgs = set(new_msgs.keys()) - set(old_msgs.keys())
     deleted_msgs = set(old_msgs.keys()) - set(new_msgs.keys())
@@ -59,16 +59,16 @@ def pprint_diff(diff):
     if len(diff['added']) > 0:
         for msg in diff['added']:
             if msg.msgid_plural == '':
-                print "New msg: msgid=%r msgstr=%r" % (msg.msgid, msg.msgstr)
+                print "New msg: msgid=%r msgstr=%r msgctxt=%r" % (msg.msgid, msg.msgstr, msg.msgctxt)
             else:
-                print "New msg: msgid=%r/%r msgstr=%r" % (msg.msgid, msg.msgid_plural, msg.msgstr)
+                print "New msg: msgid=%r/%r msgstr=%r msgctxt=%r" % (msg.msgid, msg.msgid_plural, msg.msgstr, msg.msgctxt)
 
     if len(diff['deleted']) > 0:
         for msg in diff['deleted']:
             if msg.msgid_plural == '':
-                print "Deleted msg: msgid=%r msgstr=%r" % (msg.msgid, msg.msgstr)
+                print "Deleted msg: msgid=%r msgstr=%r msgctxt=%r" % (msg.msgid, msg.msgstr, msg.msgctxt)
             else:
-                print "Deleted msg: msgid=%r/%r msgstr=%r" % (msg.msgid, msg.msgid_plural, msg.msgstr)
+                print "Deleted msg: msgid=%r/%r msgstr=%r msgctxt=%r" % (msg.msgid, msg.msgid_plural, msg.msgstr, msg.msgctxt)
 
     for msg in diff['changed']:
         old, new = msg['old'], msg['new']
