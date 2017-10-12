@@ -108,17 +108,25 @@ def exit_code(diff):
     diff_keys = ['added', 'deleted', 'changed', 'added_metadata_keys', 'deleted_metadata_keys', 'changed_metadata']
     return 0 if all(len(diff[key]) == 0 for key in diff_keys) else 1
 
+def print_counts(diffs):
+	print "Added: %s" % len(diffs["added"])
+	print "Deleted: %s" % len(diffs["deleted"])
+	print "Changed: %s" % len(diffs["changed"])
+	
 def main():
     parser = argparse.ArgumentParser()
     #parser.add_argument('--no-ignore-comments')
 
     parser.add_argument('old_file')
     parser.add_argument('new_file')
+    parser.add_argument('-c', "--counts", help="display counts of added, deleted, changed", action="store_true")
     args = parser.parse_args()
-
     diffs = podiff(polib.pofile(args.old_file), polib.pofile(args.new_file))
 
     pprint_diff(diffs)
+    if args.counts:
+        print_counts(diffs)
+		
     return exit_code(diffs)
 
 
